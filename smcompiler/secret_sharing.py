@@ -5,6 +5,8 @@ Secret sharing scheme.
 from __future__ import annotations
 
 from typing import List
+import random
+import json
 
 
 class Share:
@@ -13,15 +15,13 @@ class Share:
     """
 
     def __init__(self, *args, **kwargs):
-        # Adapt constructor arguments as you wish
-        raise NotImplementedError("You need to implement this method.")
+        self.value = value
 
     def __repr__(self):
-        # Helps with debugging.
-        raise NotImplementedError("You need to implement this method.")
+        return f"{self.__class__.__name__}({self.value})"
 
     def __add__(self, other):
-        raise NotImplementedError("You need to implement this method.")
+        return Share(addProt(self.value, other.value))
 
     def __sub__(self, other):
         raise NotImplementedError("You need to implement this method.")
@@ -30,23 +30,32 @@ class Share:
         raise NotImplementedError("You need to implement this method.")
 
     def serialize(self):
-        """Generate a representation suitable for passing in a message."""
-        raise NotImplementedError("You need to implement this method.")
+        return json.dumps({"value": self.value})
 
     @staticmethod
     def deserialize(serialized) -> Share:
-        """Restore object from its serialized representation."""
-        raise NotImplementedError("You need to implement this method.")
+        data = json.loads(serialized)
+        return Share(data["value"])
 
 
 def share_secret(secret: int, num_shares: int) -> List[Share]:
-    """Generate secret shares."""
-    raise NotImplementedError("You need to implement this method.")
+    shares = []
+    nthShareVal = Share(secret)
+    for i in range(num_shares - 1):
+        iShare = Share(random.randint(0, mod_field))
+        nthShareVal -= iShare
+        shares.append(iShare)
+    shares.append(nthShareVal)
+    return shares
 
 
 def reconstruct_secret(shares: List[Share]) -> int:
-    """Reconstruct the secret from shares."""
-    raise NotImplementedError("You need to implement this method.")
+    fullSecret = sum(shares, Share(0))
+    return fullSecret.value
 
 
 # Feel free to add as many methods as you want.
+
+#method for add from theory
+def addProt(left, right):
+    return (left+right) % (mod_field)

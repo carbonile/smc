@@ -39,8 +39,7 @@ class Expression:
         self.id = id
 
     def __add__(self, other):
-        raise NotImplementedError("You need to implement this method.")
-
+        return AddOp(self, other)
 
     def __sub__(self, other):
         raise NotImplementedError("You need to implement this method.")
@@ -85,9 +84,11 @@ class Secret(Expression):
 
     def __init__(
             self,
-            id: Optional[bytes] = None
+            id: Optional[bytes] = None,
+            value: Optional[int] = None
         ):
         super().__init__(id)
+        self.value = value
 
 
     def __repr__(self):
@@ -100,3 +101,18 @@ class Secret(Expression):
 
 
 # Feel free to add as many classes as you like.
+class AddOp(Expression):
+    def __init__(self,
+                 left,
+                 right,
+                 id: Optional[bytes] = None,
+                 ):
+
+        super().__init__(id)
+        self.left = left
+        self.right = right
+
+    def __repr__(self):
+        return (
+            f"({repr(self.left)} + {repr(self.right)})"
+        )

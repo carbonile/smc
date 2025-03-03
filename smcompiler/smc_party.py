@@ -56,12 +56,24 @@ class SMCParty:
         self.protocol_spec = protocol_spec
         self.value_dict = value_dict
 
+        # stores secret shares
+        self.my_shares = dict()
+
 
     def run(self) -> int:
         """
         The method the client use to do the SMC.
         """
-        raise NotImplementedError("You need to implement this method.")
+        # first step to create the secret shares and send them 
+        self.share_secrets()
+        # intermediate computation
+        finalShare = self.process_expression(self.protocol_spec.expr)
+        # reconstruction 
+        finalResult = self.reconstruct_result(finalShare)
+
+        return finalResult
+
+
 
 
     # Suggestion: To process expressions, make use of the *visitor pattern* like so:
