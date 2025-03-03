@@ -5,8 +5,11 @@ Secret sharing scheme.
 from __future__ import annotations
 
 from typing import List
-import random
+from random import randint
 import json
+
+# our p to establish the Field F
+field = 307
 
 
 class Share:
@@ -15,7 +18,7 @@ class Share:
     """
 
     def __init__(self, *args, **kwargs):
-        self.value = value
+        self.value = value % field
 
     def __repr__(self):
         return f"{self.__class__.__name__}({self.value})"
@@ -39,23 +42,23 @@ class Share:
 
 
 def share_secret(secret: int, num_shares: int) -> List[Share]:
-    shares = []
-    nthShareVal = Share(secret)
-    for i in range(num_shares - 1):
-        iShare = Share(random.randint(0, mod_field))
-        nthShareVal -= iShare
-        shares.append(iShare)
-    shares.append(nthShareVal)
-    return shares
+    shares = [Share() for _ in range(num_shares)]
+        shares[0] = Share(secret)
+        for i in range(1, num_shares): 
+            shares[i] = Share(randint(0, Share.p))
+            shares[0] -= shares[i]
+        return shares 
 
 
 def reconstruct_secret(shares: List[Share]) -> int:
-    fullSecret = sum(shares, Share(0))
-    return fullSecret.value
+    res = Share()
+    for share in shares:
+        res += share
+    return res.value
 
 
 # Feel free to add as many methods as you want.
 
 #method for add from theory
 def addProt(left, right):
-    return (left+right) % (mod_field)
+    return (left+right) % (field)
